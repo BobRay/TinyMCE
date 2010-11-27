@@ -42,7 +42,7 @@ var Tiny = {
             tinyMCE.execCommand('mceRemoveControl', false, el.dom.id);
         },this);
     }
-    
+
     ,toggle: function(e,t) {
         t = t.id.replace(/-toggle/,'');
         ed = tinyMCE.get(t);
@@ -50,21 +50,23 @@ var Tiny = {
             ed.isHidden() ? ed.show() : ed.hide();
         }
     }
-    
-    ,onChange: function(ed,e) {        
+
+    ,onChange: function(ed,e) {
         if (!Ext.isEmpty(tinyMCE)) {
             ed.save();
             try {
                 var ta = Ext.get(ed.id);
                 if (ta) {
                     ta.dom.value = ed.getContent();
+                    ta.dom.innerHTML = ta.dom.value;
                 }
             } catch (e) {}
         }
 
-        Ext.getCmp('modx-panel-resource').markDirty();
+        var pr = Ext.getCmp('modx-panel-resource');
+        if (pr) pr.markDirty();
     }
-    
+
     ,loadBrowser: function(fld, url, type, win) {
         tinyMCE.activeEditor.windowManager.open({
             file: Tiny.config.browserUrl+'&ctx='+(MODx.ctx || 'web')
@@ -84,7 +86,7 @@ var Tiny = {
      * Prevents MODx tags from becoming &amp;=`value`
      */
     ,onCleanup: function(type,value) {
-	switch (type) {
+    switch (type) {
             case "get_from_editor":
             case "insert_to_editor":
                 var regexp = /(\[\[[^\]]*)&amp;([^\[]*\]\])/g;
@@ -99,7 +101,7 @@ var Tiny = {
             case "submit_content_dom":
                 //value.innerHTML = value.innerHTML.replace('&amp;','&');
             break;
-	}
+    }
         return value;
     }
     ,addContentBelow: function() {
@@ -162,30 +164,36 @@ var Tiny = {
                 }
             }
             ,renderTo: 'tiny-content-above'
-        });   
+        });
     }
     ,onExecCommand: function(ed,el,cmd,ui,v) {
         Ext.getCmp('modx-panel-resource').markDirty();
-	return false;
+    return false;
     }
 };
 
 MODx.loadRTE = function(id) {
-    var s = Tiny.config || {};
-    delete s.assets_path;
-    delete s.assets_url;
-    delete s.core_path;
-    delete s.css_path;
-    delete s.editor;
-    delete s.id;
-    delete s.mode;
-    delete s.path;
-    s.cleanup_callback = "Tiny.onCleanup";
-    var z = Ext.state.Manager.get(MODx.siteId+'-tiny');
-    if (z !== false) {
-        delete s.elements;
+    if (Tiny.config){
+        var s = Tiny.config || {};
+        delete s.assets_path;
+        delete s.assets_url;
+        delete s.core_path;
+        delete s.css_path;
+        delete s.editor;
+        delete s.id;
+        delete s.mode;
+        delete s.path;
+        s.cleanup_callback = "Tiny.onCleanup";
+        var z = Ext.state.Manager.get(MODx.siteId + '-tiny');
+        if (z !== false) {
+            delete s.elements;
+        }
+        if (Tiny.config.frontend||Tiny.config.selector){
+            s.mode = "specific_textareas";
+            s.editor_selector = Tiny.config.selector||"modx-richtext";
+        }
+        tinyMCE.init(s);
     }
-    tinyMCE.init(s);
 
     /*Tiny.addContentAbove();*/
     Tiny.addContentBelow();
@@ -198,6 +206,8 @@ MODx.loadRTE = function(id) {
         if (!oid) return;
         tinyMCE.execCommand('mceAddControl',false,id);
     }
+
+
 };
 MODx.afterTVLoad = function() {
     Tiny.onTVLoad();
@@ -211,7 +221,7 @@ MODx.unloadTVRTE = function() {
 Tiny.button.Image = function(config) {
     config = config || {};
     Ext.applyIf(config,{
-        
+
     });
     Tiny.button.Image.superclass.constructor.call(this,config);
     this.config = config;
