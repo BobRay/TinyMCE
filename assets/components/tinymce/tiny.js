@@ -42,7 +42,7 @@ var Tiny = {
             tinyMCE.execCommand('mceRemoveControl', false, el.dom.id);
         },this);
     }
-    
+
     ,toggle: function(e,t) {
         t = t.id.replace(/-toggle/,'');
         ed = tinyMCE.get(t);
@@ -50,8 +50,8 @@ var Tiny = {
             ed.isHidden() ? ed.show() : ed.hide();
         }
     }
-    
-    ,onChange: function(ed,e) {        
+
+    ,onChange: function(ed,e) {
         if (!Ext.isEmpty(tinyMCE)) {
             ed.save();
             try {
@@ -66,7 +66,7 @@ var Tiny = {
         var pr = Ext.getCmp('modx-panel-resource');
         if (pr) pr.markDirty();
     }
-    
+
     ,loadBrowser: function(fld, url, type, win) {
         tinyMCE.activeEditor.windowManager.open({
             file: Tiny.config.browserUrl+'&ctx='+(MODx.ctx || 'web')
@@ -164,11 +164,12 @@ var Tiny = {
                 }
             }
             ,renderTo: 'tiny-content-above'
-        });   
+        });
     }
     ,onExecCommand: function(ed,el,cmd,ui,v) {
-        Ext.getCmp('modx-panel-resource').markDirty();
-	return false;
+        var pr = Ext.getCmp('modx-panel-resource');
+        if (pr) pr.markDirty();
+	    return false;
     }
 };
 
@@ -190,9 +191,9 @@ MODx.loadRTE = function(id) {
         }
         if (Tiny.config.frontend||Tiny.config.selector){
             s.mode = "specific_textareas";
-            s.editor_selector = Tiny.config.selector||"modx-richtext";        
+            s.editor_selector = Tiny.config.selector||"modx-richtext";
         }
-        tinyMCE.init(s);		
+        tinyMCE.init(s);
 	}
 
     /*Tiny.addContentAbove();*/
@@ -221,7 +222,7 @@ MODx.unloadTVRTE = function() {
 Tiny.button.Image = function(config) {
     config = config || {};
     Ext.applyIf(config,{
-        
+
     });
     Tiny.button.Image.superclass.constructor.call(this,config);
     this.config = config;
